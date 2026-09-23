@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quilt-canon-trace"
+version = "0.1.0"
+description = "Substrate walker trajectory generator — visualizes canon path through the substrate"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "SuperInstance", email = "[email protected]"}]
+keywords = ["trace", "walker", "trajectory", "canon", "quilt", "substrate", "visualization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.scripts]
+quilt-canon-trace = "quilt_canon_trace.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quilt_canon_trace*"]

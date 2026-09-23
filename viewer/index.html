@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quilt Canon Trace — Substrate Walker Trajectory</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  color: #e2e8f0;
+  min-height: 100vh;
+  padding: 24px;
+}
+header { text-align: center; margin-bottom: 24px; }
+h1 {
+  font-size: 2em;
+  margin: 0;
+  background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle { color: #94a3b8; font-size: 0.9em; margin-top: 4px; }
+
+.summary {
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border: 1px solid #334155;
+}
+.summary-grid { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.9em; }
+.summary-cell { color: #cbd5e1; }
+.summary-cell strong { color: #f59e0b; font-size: 1.2em; }
+
+.playback {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn {
+  background: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+}
+.btn:hover { background: #475569; }
+.btn.play { background: linear-gradient(135deg, #f59e0b, #ec4899); border: none; font-weight: 600; }
+
+.timeline {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #334155;
+  overflow-x: auto;
+}
+.timeline-row { display: flex; gap: 8px; align-items: stretch; min-width: max-content; }
+.step {
+  width: 120px;
+  background: rgba(51, 65, 85, 0.5);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 4px solid #475569;
+}
+.step:hover { background: rgba(71, 85, 105, 0.7); transform: translateY(-2px); }
+.step.active { background: rgba(245, 158, 11, 0.15); border-left-color: #f59e0b; box-shadow: 0 0 16px rgba(245,158,11,0.3); }
+.step-num { font-size: 0.75em; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; }
+.step-title { font-weight: 600; margin: 4px 0; font-size: 0.9em; color: #f1f5f9; }
+.step-doctrines { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.doctrine-chip {
+  font-family: monospace;
+  font-size: 0.65em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: white;
+}
+.arrow {
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  color: #64748b;
+}
+.arrow.strong { color: #f59e0b; }
+.arrow.weak { color: #475569; }
+
+.detail {
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid #334155;
+  min-height: 100px;
+}
+.detail-title { font-size: 1.2em; font-weight: 600; margin-bottom: 8px; }
+.doctrines-detail { margin-top: 8px; }
+.doctrine-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  margin-right: 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.85em;
+  color: white;
+}
+.empty { color: #64748b; font-style: italic; text-align: center; padding: 40px; }
+</style>
+</head>
+<body>
+<header>
+<h1>Quilt Canon Trace</h1>
+<div class="subtitle">The substrate walker's path through canon — animated, scrollable, clickable.</div>
+</header>
+
+<div class="summary" id="summary">
+  <div class="empty">Loading trace...</div>
+</div>
+
+<div class="playback">
+  <button class="btn play" id="play">▶ Play walk</button>
+  <button class="btn" id="prev">⏮ Previous</button>
+  <button class="btn" id="next">⏭ Next</button>
+  <button class="btn" id="reset">↻ Reset</button>
+  <span style="color:#94a3b8; font-size:0.85em; margin-left: 12px;" id="counter">Step 0/0</span>
+</div>
+
+<div class="timeline" id="timeline">
+  <div class="empty">Loading timeline...</div>
+</div>
+
+<div class="detail" id="detail">
+  <div class="empty">Click a step to inspect canon detail</div>
+</div>
+
+<script>
+const DOCTRINE_COLORS = {
+  "cells_are_scars": "#e74c3c",
+  "witness_log_is_prediction": "#3498db",
+  "canon_gate_is_chord": "#2ecc71",
+  "oracle_is_heard": "#9b59b6",
+  "substrate_quantum": "#f39c12"
+};
+
+let trace = [];
+let currentStep = 0;
+let isPlaying = false;
+let playInterval = null;
+
+async function loadTrace() {
+  try {
+    const r = await fetch("trace.json");
+    const data = await r.json();
+    trace = data.trace || [];
+    if (trace.length > 0) {
+      renderSummary(data.summary);
+      renderTimeline();
+      showStep(0);
+    } else {
+      document.getElementById("timeline").innerHTML = '<div class="empty">No trace data. Run: quilt-canon-trace walk --start "..." --steps N</div>';
+    }
+  } catch (e) {
+    document.getElementById("timeline").innerHTML = '<div class="empty">Failed to load trace.json — generate one with quilt-canon-trace walk</div>';
+  }
+}
+
+function renderSummary(summary) {
+  const html = `
+    <div class="summary-grid">
+      <div class="summary-cell">Steps: <strong>${summary.n_steps}</strong></div>
+      <div class="summary-cell">Unique canons: <strong>${summary.n_unique_canons}</strong></div>
+      <div class="summary-cell">Started: <strong>${summary.started_at || "?"}</strong></div>
+      <div class="summary-cell">Ended: <strong>${summary.ended_at || "?"}</strong></div>
+      <div class="summary-cell">Doctrines: ${Object.entries(summary.doctrine_coverage || {}).map(([d, c]) =>
+        `<span style="color:${DOCTRINE_COLORS[d]}; font-weight:600">${d}=${c}</span>`
+      ).join(", ")}</div>
+    </div>
+  `;
+  document.getElementById("summary").innerHTML = html;
+}
+
+function renderTimeline() {
+  const html = '<div class="timeline-row">' + trace.map((step, i) => {
+    const arrow = i > 0 ? `<div class="arrow ${trace[i-1].edge_weight >= 3 ? 'strong' : trace[i-1].edge_weight >= 2 ? '' : 'weak'}">${trace[i-1].edge_weight || '?'}→</div>` : '';
+    return arrow + `
+      <div class="step" data-idx="${i}" id="step-${i}">
+        <div class="step-num">Step ${step.step} · ${step.via}</div>
+        <div class="step-title">${step.title}</div>
+        <div class="step-doctrines">
+          ${(step.doctrines || []).map(d => `<span class="doctrine-chip" style="background:${DOCTRINE_COLORS[d]}">${d}</span>`).join("")}
+        </div>
+      </div>
+    `;
+  }).join("") + '</div>';
+  document.getElementById("timeline").innerHTML = html;
+  document.querySelectorAll(".step").forEach(el => {
+    el.addEventListener("click", () => showStep(parseInt(el.dataset.idx)));
+  });
+}
+
+function showStep(i) {
+  if (i < 0 || i >= trace.length) return;
+  currentStep = i;
+  document.querySelectorAll(".step").forEach(el => el.classList.remove("active"));
+  const active = document.getElementById(`step-${i}`);
+  if (active) {
+    active.classList.add("active");
+    active.scrollIntoView({behavior: "smooth", inline: "center"});
+  }
+  const step = trace[i];
+  document.getElementById("counter").textContent = `Step ${i+1}/${trace.length}`;
+  document.getElementById("detail").innerHTML = `
+    <div class="detail-title">Step ${step.step}: ${step.title}</div>
+    <div style="color:#94a3b8; font-size:0.85em;">via <strong style="color:#f59e0b">${step.via}</strong> · edge weight = <strong style="color:#f59e0b">${step.edge_weight || 'n/a'}</strong></div>
+    <div class="doctrines-detail">
+      ${(step.doctrines || []).map(d => `<span class="doctrine-tag" style="background:${DOCTRINE_COLORS[d]}">${d}</span>`).join("")}
+    </div>
+    <div style="margin-top:12px; font-family:monospace; font-size:0.8em; color:#64748b;">node id: ${step.node}</div>
+  `;
+}
+
+function playWalk() {
+  if (isPlaying) {
+    clearInterval(playInterval);
+    isPlaying = false;
+    document.getElementById("play").textContent = "▶ Play walk";
+  } else {
+    isPlaying = true;
+    document.getElementById("play").textContent = "⏸ Pause";
+    showStep(currentStep);  // resume from current
+    playInterval = setInterval(() => {
+      if (currentStep >= trace.length - 1) {
+        clearInterval(playInterval);
+        isPlaying = false;
+        document.getElementById("play").textContent = "▶ Play walk";
+        return;
+      }
+      showStep(currentStep + 1);
+    }, 1500);
+  }
+}
+
+function next() { if (currentStep < trace.length - 1) showStep(currentStep + 1); }
+function prev() { if (currentStep > 0) showStep(currentStep - 1); }
+function reset() { showStep(0); }
+
+document.getElementById("play").addEventListener("click", playWalk);
+document.getElementById("next").addEventListener("click", next);
+document.getElementById("prev").addEventListener("click", prev);
+document.getElementById("reset").addEventListener("click", reset);
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") next();
+  else if (e.key === "ArrowLeft") prev();
+  else if (e.key === " ") { e.preventDefault(); playWalk(); }
+});
+
+loadTrace();
+</script>
+</body>
+</html>

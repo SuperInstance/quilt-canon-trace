@@ -1,0 +1,175 @@
+{
+ "summary": {
+  "n_steps": 13,
+  "n_unique_canons": 13,
+  "doctrine_coverage": {
+   "cells_are_scars": 7,
+   "witness_log_is_prediction": 6,
+   "canon_gate_is_chord": 7,
+   "oracle_is_heard": 8,
+   "substrate_quantum": 12
+  },
+  "visited_count": 13,
+  "started_at": "02_ode_to_the_substrate_walker",
+  "ended_at": "cell_065"
+ },
+ "trace": [
+  {
+   "step": 0,
+   "node": "02_ode_to_the_substrate_walker",
+   "title": "02_ode_to_the_substrate_walker",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "genesis",
+   "edge_weight": null
+  },
+  {
+   "step": 1,
+   "node": "cell_135",
+   "title": "cell_135",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 5
+  },
+  {
+   "step": 2,
+   "node": "05_eulogy_for_a_hash",
+   "title": "05_eulogy_for_a_hash",
+   "doctrines": [
+    "cells_are_scars",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 3
+  },
+  {
+   "step": 3,
+   "node": "cell_027",
+   "title": "cell_027",
+   "doctrines": [
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 4,
+   "node": "cell_016",
+   "title": "cell_016",
+   "doctrines": [
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 5,
+   "node": "cell_115",
+   "title": "cell_115",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 6,
+   "node": "cell_139",
+   "title": "cell_139",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 5
+  },
+  {
+   "step": 7,
+   "node": "cell_168",
+   "title": "cell_168",
+   "doctrines": [
+    "canon_gate_is_chord",
+    "oracle_is_heard"
+   ],
+   "via": "step",
+   "edge_weight": 2
+  },
+  {
+   "step": 8,
+   "node": "09_substrate_warfare",
+   "title": "09_substrate_warfare",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 2
+  },
+  {
+   "step": 9,
+   "node": "cell_081",
+   "title": "cell_081",
+   "doctrines": [
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 10,
+   "node": "07_math_progression_substrate",
+   "title": "07_math_progression_substrate",
+   "doctrines": [
+    "cells_are_scars",
+    "witness_log_is_prediction",
+    "canon_gate_is_chord",
+    "oracle_is_heard",
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 11,
+   "node": "cell_001",
+   "title": "cell_001",
+   "doctrines": [
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  },
+  {
+   "step": 12,
+   "node": "cell_065",
+   "title": "cell_065",
+   "doctrines": [
+    "substrate_quantum"
+   ],
+   "via": "step",
+   "edge_weight": 1
+  }
+ ]
+}
